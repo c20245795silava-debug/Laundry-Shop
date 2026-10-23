@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFold Laundry | Pickup, Wash, Fold, Delivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- ===== STARTER HEAD: keep these exact tags ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
+
+        /* C2: palette tokens, defined once. 60% dominant / 30% secondary / 10% accent */
+        :root {
+            --dominant: #0b5fa5;   /* 60%: page background (blue) */
+            --secondary: #2a8bd6;  /* 30%: glass panels, nav, cards (lighter blue) */
+            --accent: #fcd34d;     /* 10%: buttons, links, fills (sunny yellow) */
+            --on-accent: #06192b;
+            --ink: #f0f9ff;
+        }
+        .dark {
+            --dominant: #08111f;
+            --secondary: #1a2a44;
+            --accent: #5cc8ff;
+            --on-accent: #06121f;
+            --ink: #e8f1fb;
+        }
+        @theme inline {
+            --color-dominant: var(--dominant);
+            --color-secondary: var(--secondary);
+            --color-accent: var(--accent);
+            --color-on-accent: var(--on-accent);
+            --color-ink: var(--ink);
+            --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+            --font-body: "Figtree", system-ui, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-body); }
+        h1, h2, h3 { font-family: var(--font-display); }
+        :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+        /* A5: reusable glassmorphism component */
+        .glass {
+            @apply backdrop-blur-xl rounded-3xl shadow-lg;
+            background: color-mix(in srgb, var(--secondary) 55%, transparent);
+            border: 1px solid color-mix(in srgb, var(--secondary) 70%, transparent);
+        }
+        .dark .glass { border-color: color-mix(in srgb, var(--ink) 14%, transparent); }
+
+        .btn {
+            @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold transition hover:-translate-y-0.5;
+            background: var(--accent);
+            color: var(--on-accent);
+        }
+        .btn-ghost { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+
+        /* Fill in/out heading: --p is animated by GSAP (default 100% so it reads fine without JS) */
+        .fill {
+            display: inline-block;
+            --p: 100%;
+            background:
+                linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / var(--p) 100%,
+                linear-gradient(color-mix(in srgb, var(--ink) 28%, transparent), color-mix(in srgb, var(--ink) 28%, transparent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+    <!-- ===== END STARTER HEAD ===== -->
+</head>
+
+<body class="bg-dominant text-ink antialiased overflow-x-hidden">
+    <!-- E2: scrub progress bar -->
+    <div id="progressBar" class="fixed top-0 left-0 z-50 h-1 w-full origin-left scale-x-0 bg-accent"></div>
+
+    <header class="sticky top-0 z-40 px-4 pt-3">
+        <nav class="glass mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3">
+            <span class="font-display text-lg font-extrabold">🧺 FreshFold</span>
+            <ul class="hidden gap-6 text-sm font-medium md:flex">
+                <li><a class="hover:text-accent" href="#about">About</a></li>
+                <li><a class="hover:text-accent" href="#services">Services</a></li>
+                <li><a class="hover:text-accent" href="#work">Work</a></li>
+                <li><a class="hover:text-accent" href="#product">Product</a></li>
+                <li><a class="hover:text-accent" href="#contact">Contact</a></li>
+            </ul>
+            <div class="flex items-center gap-2">
+                <button id="replayBtn" type="button"
+                    class="rounded-full border border-ink/20 px-4 py-2 text-sm font-medium hover:border-accent">
+                    Replay Intro
+                </button>
+                <button id="darkModeToggle" type="button" aria-pressed="false"
+                    class="rounded-full border border-ink/20 px-4 py-2 text-sm font-medium hover:border-accent">
+                    Dark Mode
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="mx-auto flex min-h-[85vh] max-w-6xl items-center px-5 py-16">
+            <div class="max-w-2xl">
+                <h1 class="hero-item text-5xl leading-[1.05] font-extrabold tracking-tight sm:text-6xl">Laundry day,
+                    handled.</h1>
+                <p class="hero-item mt-5 max-w-xl text-lg text-ink/75">We pick up your laundry, wash it, fold it, and
+                    bring it back clean within 24 hours.</p>
+                <div class="hero-item mt-8 flex flex-wrap gap-3">
+                    <a href="#contact" class="btn">Schedule a pickup</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="reveal mx-auto max-w-6xl scroll-mt-24 px-5 py-20">
+            <div class="glass grid gap-8 p-8 md:grid-cols-2 md:p-12">
+                <h2 class="fill text-4xl font-extrabold tracking-tight">Clean clothes without the chore</h2>
+                <p class="text-lg text-ink/80">FreshFold is a neighborhood laundry service for busy households and small
+                    businesses. We use gentle, eco-friendly detergents, sort every order by fabric, and return it folded
+                    and sealed. Book online, leave the bag at your door, and we handle the rest.</p>
+            </div>
+        </section>
+
+        <section id="services" class="reveal mx-auto max-w-6xl scroll-mt-24 px-5 py-20">
+            <h2 class="fill text-4xl font-extrabold tracking-tight">Services</h2>
+            <p class="mt-3 max-w-xl text-ink/75">Care matched to every fabric.</p>
+            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <article class="card glass p-6">
+                    <div class="text-4xl">👕</div>
+                    <h3 class="mt-3 text-xl font-bold">Wash &amp; Fold</h3>
+                    <p class="mt-2 text-sm text-ink/75">Everyday clothes washed, dried, and neatly folded.</p>
+                </article>
+                <article class="card glass p-6">
+                    <div class="text-4xl">🧥</div>
+                    <h3 class="mt-3 text-xl font-bold">Dry Cleaning</h3>
+                    <p class="mt-2 text-sm text-ink/75">Suits, dresses, and coats pressed with care.</p>
+                </article>
+                <article class="card glass p-6">
+                    <div class="text-4xl">🛏️</div>
+                    <h3 class="mt-3 text-xl font-bold">Bedding &amp; Linens</h3>
+                    <p class="mt-2 text-sm text-ink/75">Sheets, duvets, and blankets refreshed.</p>
+                </article>
+                <article class="card glass p-6">
+                    <div class="text-4xl">👟</div>
+                    <h3 class="mt-3 text-xl font-bold">Sneaker Cleaning</h3>
+                    <p class="mt-2 text-sm text-ink/75">Deep clean and deodorize, with no damage.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- PIN: this section stays fixed while the four steps light up (E2/pin). .reveal is on the inner header so the pinned element itself is never transformed -->
+        <section id="work" class="mx-auto flex min-h-screen max-w-6xl scroll-mt-0 flex-col justify-center px-5 py-16">
+            <div class="reveal">
+                <h2 class="fill text-4xl font-extrabold tracking-tight">How our work flows</h2>
+                <p class="mt-3 max-w-xl text-ink/75">From your door to ours and back, in four steps.</p>
+            </div>
+            <div id="stepLine" class="mt-8 h-1 origin-left rounded-full bg-accent"></div>
+            <div class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+                <div class="step glass p-5">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-bold text-on-accent">
+                        1</div>
+                    <h3 class="mt-3 text-lg font-bold">Schedule</h3>
+                    <p class="mt-1 text-sm text-ink/75">Book a pickup online in under a minute.</p>
+                </div>
+                <div class="step glass p-5">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-bold text-on-accent">
+                        2</div>
+                    <h3 class="mt-3 text-lg font-bold">We pick up</h3>
+                    <p class="mt-1 text-sm text-ink/75">Our driver collects your bag at your door.</p>
+                </div>
+                <div class="step glass p-5">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-bold text-on-accent">
+                        3</div>
+                    <h3 class="mt-3 text-lg font-bold">We clean</h3>
+                    <p class="mt-1 text-sm text-ink/75">Washed, dried, and folded by fabric type.</p>
+                </div>
+                <div class="step glass p-5">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-bold text-on-accent">
+                        4</div>
+                    <h3 class="mt-3 text-lg font-bold">Delivered</h3>
+                    <p class="mt-1 text-sm text-ink/75">Fresh laundry back at your door in 24 hours.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="product" class="reveal mx-auto max-w-6xl scroll-mt-24 px-5 py-20">
+            <h2 class="fill text-4xl font-extrabold tracking-tight">Plans and prices</h2>
+            <p class="mt-3 max-w-xl text-ink/75">Free pickup and delivery on orders over ₱500. Prices are placeholders;
+                edit to match your shop.</p>
+            <div class="mt-10 grid items-stretch gap-6 md:grid-cols-3">
+                <article class="card glass flex flex-col p-8">
+                    <h3 class="text-xl font-bold">Pay as you go</h3>
+                    <p class="mt-3 font-display text-4xl font-extrabold">₱50<span
+                            class="text-base font-medium text-ink/70"> / kg</span></p>
+                    <ul class="mt-5 flex-1 space-y-2 text-sm text-ink/80">
+                        <li>✓ Wash, dry, and fold</li>
+                        <li>✓ 24-hour turnaround</li>
+                        <li>✓ Eco-friendly detergent</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-ghost mt-6">Choose plan</a>
+                </article>
+                <article class="card glass flex flex-col border-2 p-8 ring-2 ring-accent">
+                    <h3 class="text-xl font-bold">Household plan <span
+                            class="ml-1 rounded-full bg-accent px-2 py-0.5 text-xs text-on-accent">Popular</span></h3>
+                    <p class="mt-3 font-display text-4xl font-extrabold">₱900<span
+                            class="text-base font-medium text-ink/70"> / month</span></p>
+                    <ul class="mt-5 flex-1 space-y-2 text-sm text-ink/80">
+                        <li>✓ 20 kg of wash and fold</li>
+                        <li>✓ Free weekly pickup and delivery</li>
+                        <li>✓ Priority scheduling</li>
+                    </ul>
+                    <a href="#contact" class="btn mt-6">Choose plan</a>
+                </article>
+                <article class="card glass flex flex-col p-8">
+                    <h3 class="text-xl font-bold">Business</h3>
+                    <p class="mt-3 font-display text-4xl font-extrabold">Custom</p>
+                    <ul class="mt-5 flex-1 space-y-2 text-sm text-ink/80">
+                        <li>✓ Linens and uniforms</li>
+                        <li>✓ Scheduled routes</li>
+                        <li>✓ Monthly invoicing</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-ghost mt-6">Get a quote</a>
+                </article>
+            </div>
+        </section>
+
+        <section id="contact" class="reveal mx-auto max-w-6xl scroll-mt-24 px-5 py-20">
+            <div class="glass grid gap-10 p-8 md:grid-cols-2 md:p-12">
+                <div>
+                    <h2 class="fill text-4xl font-extrabold tracking-tight">Book your pickup</h2>
+                    <p class="mt-4 text-ink/80">Tell us what you need and we will reply the same day.</p>
+                    <ul class="mt-6 space-y-2 text-sm text-ink/80">
+                        <li>📍 Miraflores Street, Barangay 3, Victorias City</li>
+                        <li>📞 09954402089</li>
+                        <li>✉️ SLaundryShop@gmail.com</li>
+                        <li>🕘 Mon to Sat, 8am to 7pm. Closed Sunday.</li>
+                    </ul>
+                </div>
+                <form action="#" class="flex flex-col gap-2">
+                    <label for="name" class="text-sm font-medium">Name</label>
+                    <input type="text" id="name" name="name" required
+                        class="rounded-xl border border-ink/20 bg-secondary/60 px-4 py-3">
+                    <label for="email" class="mt-2 text-sm font-medium">Email</label>
+                    <input type="email" id="email" name="email" required
+                        class="rounded-xl border border-ink/20 bg-secondary/60 px-4 py-3">
+                    <label for="message" class="mt-2 text-sm font-medium">Message</label>
+                    <textarea id="message" name="message" rows="4" required
+                        class="rounded-xl border border-ink/20 bg-secondary/60 px-4 py-3"></textarea>
+                    <button type="submit" class="btn mt-4">Send message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="px-5 pb-10 text-center text-sm text-ink/70">
+        <p>Thank you and God Bless.</p>
+    </footer>
+
+    <!-- Load order matters: GSAP, then ScrollTrigger, then your own script -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
